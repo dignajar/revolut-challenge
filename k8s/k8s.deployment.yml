@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-deployment
+  labels:
+    app: hello
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      containers:
+      - name: hello
+        image: docker.registry.com/hello:1.0.0
+        env:
+        - name: RDS_HOST
+          value: "<RDS ENDPOINT>"
+        - name: RDS_PORT
+          value: "5432"
+        - name: RDS_DBNAME
+          value: "<RDS DATABASE NAME>"
+        - name: RDS_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: hello-secret
+              key: rds_username
+        - name: RDS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: hello-secret
+              key: rds_password
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
